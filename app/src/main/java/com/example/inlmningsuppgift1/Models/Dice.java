@@ -1,5 +1,7 @@
 package com.example.inlmningsuppgift1.Models;
 
+import android.util.Log;
+
 import java.util.Random;
 
 public class Dice {
@@ -11,9 +13,9 @@ public class Dice {
 
     private Random random = new Random();
 
-    public void Dice() {
-        keepDice = true;
-        diceUsed = true;
+    public  Dice() {
+        keepDice = false;
+        diceUsed = false;
         randomizeDice();
     }
 
@@ -37,12 +39,19 @@ public class Dice {
 
     public void randomizeDice() {
         dice = random.nextInt(6) + 1;
+    }
 
+    public int getDiceValue() {
+        return dice;
     }
 
     public void resetDice() {
         keepDice = false;
         diceUsed = false;
         randomizeDice();
+    }
+
+    public Dice getDice() {
+        return this;
     }
 }

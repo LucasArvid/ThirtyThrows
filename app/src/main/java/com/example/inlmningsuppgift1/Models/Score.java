@@ -10,64 +10,148 @@ public class Score {
     private static int groupedScore;
     private static int[] gradingLowScore;
     private static ArrayList<Integer> scoreTracker;
-    private static int[] roundScore;
+    private int[] roundScore;
+    private ArrayList<Integer> roundGrading;
+    private static int totalScore;
 
-    public void Score() {
+    private ArrayList<String> unUsedGradings;
+
+
+
+    public Score() {
         dicePairs = 0;
         groupedScore = 0;
         gradingLowScore = new int[6];
         scoreTracker = new ArrayList<>();
         roundScore = new int[10];
+        roundGrading = new ArrayList<>();
+
+        setupUnusedGradings();
     }
 
-    public static int getDicePairs() {
+    public int getDicePairs() {
         return dicePairs;
     }
 
-    public static void setDicePairs(int dicePairs) {
+    public void setDicePairs(int dicePairs) {
         Score.dicePairs = dicePairs;
     }
 
-    public static int getGroupedScore() {
+    public int getGroupedScore() {
         return groupedScore;
     }
 
-    public static void setGroupedScore(int groupedScore) {
+    public void setGroupedScore(int groupedScore) {
         Score.groupedScore = groupedScore;
     }
 
-    public static int[] getGradingLowScore() {
+    public void updateGroupedScore(int groupedScore) {
+        Score.groupedScore += groupedScore;
+    }
+
+    public int[] getGradingLowScore() {
         return gradingLowScore;
     }
 
-    public static void setGradingLowScore(int[] gradingLowScore) {
+    public void setGradingLowScore(int[] gradingLowScore) {
         Score.gradingLowScore = gradingLowScore;
     }
 
-    public static ArrayList<Integer> getScoreTracker() {
+    public ArrayList<Integer> getScoreTracker() {
         return scoreTracker;
     }
 
-    public static void setScoreTracker(ArrayList<Integer> scoreTracker) {
+    public static void updateScoreTracker(int value) {
+        scoreTracker.add(value);
+    }
+
+    public void setScoreTracker(ArrayList<Integer> scoreTracker) {
         Score.scoreTracker = scoreTracker;
     }
 
-    public static int[] getRoundScore() {
+    public int[] getRoundScore() {
         return roundScore;
     }
 
-    public static void setRoundScore(int[] roundScore) {
-        Score.roundScore = roundScore;
-    }
-
-    public static void handleGradingLow(int index){
+    public void handleGradingLow(Dice dice){
         Log.d("", "SET USED");
-        diceUsed[index] = true;
+        dice.setDiceUsed(true);
         for (int i = 0; i < scoreTracker.size(); i++) {
             gradingLowScore[i] = scoreTracker.get(i);
             Log.d("Debug", "" + gradingLowScore[i]);
         }
         groupedScore = 0;
+    }
+
+    public void handleGradingElse(Dice dice, int target, int round) {
+        Log.d("", "SET USED");
+        dice.setDiceUsed(true);
+
+        dicePairs ++;
+
+        // Clear score tracker and score counter
+        groupedScore = 0;
+    }
+
+    public int calculateScore(int grading, int round) {
+        // Summan av alla för valet ingående tärningars värde ger poängen
+        int score = 0;
+        score = dicePairs * grading;
+        Log.d("GameLogic", "GameLogic Else Score: " + score);
+        roundScore[round] = score;
+        roundGrading.add(grading);
+        dicePairs = 0;
+        totalScore += score;
+
+        while(unUsedGradings.contains(Integer.toString(grading)))
+            unUsedGradings.remove(Integer.toString(grading));
+
+        return score;
+    }
+
+    public int calculateLowScore() {
+        int score = 0;
+        for (int i = 0; i < gradingLowScore.length; i++) {
+            score += gradingLowScore[i];
+        }
+
+        roundScore[roundGrading.size()] = score;
+        roundGrading.add(3);
+        totalScore += score;
+        Log.d("GameLogic", "GameLogic Low Score: " + score);
+
+        while(unUsedGradings.contains("LOW"))
+            unUsedGradings.remove("LOW");
+
+        return score;
+    }
+
+    public void resetRoundScoreTracker() {
+        scoreTracker.clear();
+        groupedScore = 0;
+    }
+
+    public ArrayList<Integer> getRoundGrading() {
+        return roundGrading;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    public void setupUnusedGradings() {
+        unUsedGradings = new ArrayList<>();
+        unUsedGradings.add("LOW");
+        for (int i = 4; i <= 12; i++)
+            unUsedGradings.add(Integer.toString(i));
+    }
+
+    public ArrayList<String> getUnUsedGradings() {
+        return unUsedGradings;
+    }
+
+    public void resetUnusedGradings() {
+        setupUnusedGradings();
     }
 
 

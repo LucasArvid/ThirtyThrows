@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Thirty Throws</string>
     <string name="button_name">Throw</string>
-    <string name="results">Results:</string>
+    <string name="results">Total Score: </string>
 </resources>

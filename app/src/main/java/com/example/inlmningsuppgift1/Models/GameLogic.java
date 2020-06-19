@@ -12,107 +12,103 @@ import java.util.*;
 
 public class GameLogic {
 
-    private static int dicePairs = 0;
-    private static int groupedScore = 0;
-    private static int[] gradingLowScore = new int[6];
 
-    private static boolean[] keepDice = new boolean[6];
-    private static boolean[] diceUsed = new boolean[6];
+    // Array of dices
+    private ArrayList<Dice> dice;
+    private Score score;
 
-    private static ArrayList<Integer> scoreTracker = new ArrayList<>();
+    public GameLogic(int amountOfDices) {
+        dice = new ArrayList<>();
+        fillDiceArray(amountOfDices);
+        score = new Score();
 
-    private static int[] dices = new int[6];
-
-    private static Random random = new Random();
-
-    private static int roundScore = 0;
-
-
-    public static void updateGroupedScore(int index) {
-        groupedScore += dices[index];
     }
 
-    public static void setGroupedScore(int value) {
-        groupedScore = 0;
+    private void fillDiceArray(int size) {
+        for (int i  = 0; i < size; i++)
+            dice.add(new Dice());
     }
 
-    public static int getGroupedScore() {
-        return groupedScore;
+
+    public void updateGroupedScore(int index) {
+        score.updateGroupedScore(dice.get(index).getDiceValue());
     }
 
-    public static void updateScoreTracker(int value) {
-        scoreTracker.add(value);
-        Log.d("", "size" +scoreTracker.size());
+    public void setGroupedScore(int value) {
+        score.setGroupedScore(value);
     }
 
-    public static void handleGradingLow(int index){
-        Log.d("", "SET USED");
-        diceUsed[index] = true;
-        for (int i = 0; i < scoreTracker.size(); i++) {
-            gradingLowScore[i] = scoreTracker.get(i);
-            Log.d("Debug", "" + gradingLowScore[i]);
+    public int getGroupedScore() {
+        return score.getGroupedScore();
+    }
+
+    public void updateScoreTracker(int value) {
+        score.updateScoreTracker(value);
+    }
+
+    public void handleGradingLow(int index){
+        score.handleGradingLow(dice.get(index));
+    }
+
+    public void randomizeDice(int index) {
+        dice.get(index).randomizeDice();
+
+    }
+
+    public void handleGradingElse(int index, int target, int round) {
+        score.handleGradingElse(dice.get(index), target, round);
+    }
+
+    public  void setKeepDice(int index, boolean KEEP) {
+        dice.get(index).setKeepDice(KEEP);
+    }
+
+    public  boolean getKeepDice(int index) {
+        return dice.get(index).isKeepDice();
+    }
+
+    public  void setDiceUsed(int index, boolean USED) {
+        dice.get(index).setDiceUsed(USED);
+    }
+
+
+    public void calculateScore(int grading, int round) {
+        score.calculateScore(grading, round);
+    }
+
+    public void calculateLowScore() {
+        score.calculateLowScore();
+    }
+
+
+    public void resetDices() {
+        score.resetRoundScoreTracker();
+        for (Dice d: dice) {
+            d.resetDice();
         }
-        groupedScore = 0;
     }
 
-    public static void randomizeDice(int index) {
-        dices[index] = random.nextInt(6) + 1;
-
+    public boolean isDiceUsed(int index) {
+        return dice.get(index).isDiceUsed();
     }
 
-    public static void handleGradingElse(int index, int target) {
-        Log.d("", "SET USED");
-        diceUsed[index] = true;
-
-        dicePairs ++;
-        // Send for score calculation
-        roundScore = GameLogic.calculateScore(target);
-
-        // Clear score tracker and score counter
-        groupedScore = 0;
+    public Dice getDice(int index) {
+        return dice.get(index);
     }
 
-    public static void setKeepDice(int index, boolean KEEP) {
-        keepDice[index] = KEEP;
+    public int getTotalScore() {
+        return score.getTotalScore();
     }
 
-    public static boolean getKeepDice(int index) {
-        return keepDice[index];
+    public int[] getRoundScore() {
+        return score.getRoundScore();
     }
 
-    public static void setDiceUsed(int index, boolean USED) {
-        diceUsed[index] = USED;
+    public ArrayList<Integer> getRoundGrading() {
+        return score.getRoundGrading();
     }
 
-
-    public static int calculateScore(int grading) {
-        // Summan av alla för valet ingående tärningars värde ger poängen
-        int score = 0;
-        score = dicePairs * grading;
-        Log.d("GameLogic", "GameLogic Else Score: " + score);
-        return score;
-    }
-
-    public static int calculateLowScore() {
-        int score = 0;
-        for (int i = 0; i < gradingLowScore.length; i++) {
-            score += gradingLowScore[i];
-        }
-        Log.d("GameLogic", "GameLogic Low Score: " + score);
-        return score;
-    }
-
-
-    public static void resetDices() {
-        scoreTracker.clear();
-        groupedScore = 0;
-    }
-
-    public static boolean isDiceUsed(int index) {
-        return diceUsed[index];
-    }
-
-    public static int getDice(int index) {
-        return dices[index];
+    public ArrayList<String> getUnusedGradings() {
+        return score.getUnUsedGradings();
     }
 }
