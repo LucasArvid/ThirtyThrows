@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +26,8 @@ public class ResultActivity extends AppCompatActivity {
     private TextView resultsView;
     private ListView resultsListView;
     private Button replayButton;
+
+    long prevTime;
 
 
     @Override
@@ -50,6 +53,7 @@ public class ResultActivity extends AppCompatActivity {
 
         populateViews();
 
+        replayButton.setText("Replay");
         replayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,5 +77,18 @@ public class ResultActivity extends AppCompatActivity {
                 stringArray );
 
         resultsListView.setAdapter(arrayAdapter);
+    }
+
+    @Override
+    public void onBackPressed() {
+        long currentTime = System.currentTimeMillis();
+
+        if ((prevTime - currentTime) < 1 && prevTime != 0) {
+            finish();
+        } else {
+            Toast.makeText(this, "Sure you want to quit?", Toast.LENGTH_LONG).show();
+            prevTime = System.currentTimeMillis();
+        }
+
     }
 }

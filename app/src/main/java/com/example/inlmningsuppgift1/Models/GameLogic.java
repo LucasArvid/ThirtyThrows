@@ -1,5 +1,7 @@
 package com.example.inlmningsuppgift1.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -10,8 +12,7 @@ import java.util.*;
  */
 
 
-public class GameLogic {
-
+public class GameLogic implements Parcelable {
 
     // Array of dices
     private ArrayList<Dice> dice;
@@ -24,8 +25,25 @@ public class GameLogic {
 
     }
 
+    protected GameLogic(Parcel in) {
+        dice = in.createTypedArrayList(Dice.CREATOR);
+        score = in.readParcelable(Score.class.getClassLoader());
+    }
+
+    public static final Creator<GameLogic> CREATOR = new Creator<GameLogic>() {
+        @Override
+        public GameLogic createFromParcel(Parcel in) {
+            return new GameLogic(in);
+        }
+
+        @Override
+        public GameLogic[] newArray(int size) {
+            return new GameLogic[size];
+        }
+    };
+
     private void fillDiceArray(int size) {
-        for (int i  = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
             dice.add(new Dice());
     }
 
@@ -46,7 +64,7 @@ public class GameLogic {
         score.updateScoreTracker(value);
     }
 
-    public void handleGradingLow(int index){
+    public void handleGradingLow(int index) {
         score.handleGradingLow(dice.get(index));
     }
 
@@ -59,15 +77,15 @@ public class GameLogic {
         score.handleGradingElse(dice.get(index), target, round);
     }
 
-    public  void setKeepDice(int index, boolean KEEP) {
+    public void setKeepDice(int index, boolean KEEP) {
         dice.get(index).setKeepDice(KEEP);
     }
 
-    public  boolean getKeepDice(int index) {
+    public boolean getKeepDice(int index) {
         return dice.get(index).isKeepDice();
     }
 
-    public  void setDiceUsed(int index, boolean USED) {
+    public void setDiceUsed(int index, boolean USED) {
         dice.get(index).setDiceUsed(USED);
     }
 
@@ -83,7 +101,7 @@ public class GameLogic {
 
     public void resetDices() {
         score.resetRoundScoreTracker();
-        for (Dice d: dice) {
+        for (Dice d : dice) {
             d.resetDice();
         }
     }
@@ -110,5 +128,16 @@ public class GameLogic {
 
     public ArrayList<String> getUnusedGradings() {
         return score.getUnUsedGradings();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(dice);
+        dest.writeParcelable(score, flags);
     }
 }

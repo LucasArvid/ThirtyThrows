@@ -1,10 +1,12 @@
 package com.example.inlmningsuppgift1.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
 
-public class Score {
+public class Score implements Parcelable {
 
     private static int dicePairs;
     private static int groupedScore;
@@ -28,6 +30,27 @@ public class Score {
 
         setupUnusedGradings();
     }
+
+    protected Score(Parcel in) {
+        dicePairs = in.readInt();
+        groupedScore = in.readInt();
+        gradingLowScore = in.createIntArray();
+        scoreTracker = in.readArrayList(String.class.getClassLoader());
+        roundScore = in.createIntArray();
+        roundGrading = in.readArrayList(String.class.getClassLoader());
+    }
+
+    public static final Creator<Score> CREATOR = new Creator<Score>() {
+        @Override
+        public Score createFromParcel(Parcel in) {
+            return new Score(in);
+        }
+
+        @Override
+        public Score[] newArray(int size) {
+            return new Score[size];
+        }
+    };
 
     public int getDicePairs() {
         return dicePairs;
@@ -155,4 +178,20 @@ public class Score {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeInt(dicePairs);
+        dest.writeInt(groupedScore);
+        dest.writeIntArray(gradingLowScore);
+        dest.writeList(scoreTracker);
+        dest.writeIntArray(roundScore);
+        dest.writeList(roundGrading);
+
+    }
 }
