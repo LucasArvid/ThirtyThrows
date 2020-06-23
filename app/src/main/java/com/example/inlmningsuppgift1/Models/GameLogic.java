@@ -17,13 +17,25 @@ public class GameLogic implements Parcelable {
     // Array of dices
     private ArrayList<Dice> dice;
 
+    // Rolls and rounds tracker
+    private int playerRolls;
+    private int playedRounds;
+
+    // target for sum of dices when grading
+    private int target;
+
     // Score class containing all data relevant to the games score
     private Score score;
+
 
     public GameLogic(int amountOfDices) {
         dice = new ArrayList<>();
         fillDiceArray(amountOfDices);
         score = new Score();
+
+        playerRolls = 0;
+        playedRounds = 0;
+        target = 0;
 
     }
 
@@ -31,6 +43,9 @@ public class GameLogic implements Parcelable {
     protected GameLogic(Parcel in) {
         dice = in.createTypedArrayList(Dice.CREATOR);
         score = in.readParcelable(Score.class.getClassLoader());
+        playerRolls = in.readInt();
+        playedRounds = in.readInt();
+        target = in.readInt();
     }
 
     public static final Creator<GameLogic> CREATOR = new Creator<GameLogic>() {
@@ -76,8 +91,8 @@ public class GameLogic implements Parcelable {
 
     }
 
-    public void handleGradingElse(int index, int target, int round) {
-        score.handleGradingElse(dice.get(index), target, round);
+    public void handleGradingElse(int index) {
+        score.handleGradingElse(dice.get(index), target, playedRounds);
     }
 
     public void setKeepDice(int index, boolean KEEP) {
@@ -93,8 +108,8 @@ public class GameLogic implements Parcelable {
     }
 
 
-    public void calculateScore(int grading, int round) {
-        score.calculateScore(grading, round);
+    public void calculateScore() {
+        score.calculateScore(target, playedRounds);
     }
 
     public void calculateLowScore() {
@@ -133,6 +148,47 @@ public class GameLogic implements Parcelable {
         return score.getUnUsedGradings();
     }
 
+    public int getPlayerRolls() {
+        return playerRolls;
+    }
+
+    public void setPlayerRolls(int playerRolls) {
+        this.playerRolls = playerRolls;
+    }
+
+    public void increasePlayerRolls() {
+        playerRolls ++;
+    }
+
+    public int getPlayedRounds() {
+        return playedRounds;
+    }
+
+    public void setPlayedRounds(int playedRounds) {
+        this.playedRounds = playedRounds;
+    }
+
+    public void increasePlayedRounds() {
+        playedRounds ++;
+    }
+
+    public int getTarget() {
+        return target;
+    }
+
+    public void setTarget(int target) {
+        this.target = target;
+    }
+
+    public void scoreRound() {
+        if (target == 3) // Grading LOW
+            calculateLowScore();
+        else // Grading else
+            calculateScore();
+    }
+
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -142,5 +198,8 @@ public class GameLogic implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(dice);
         dest.writeParcelable(score, flags);
+        dest.writeInt(playerRolls);
+        dest.writeInt(playedRounds);
+        dest.writeInt(target);
     }
 }

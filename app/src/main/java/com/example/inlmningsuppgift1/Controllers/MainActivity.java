@@ -38,20 +38,12 @@ public class MainActivity extends AppCompatActivity {
     // Used to track time between back button clicks, used to confirm intended action
     long prevTime;
 
-    // Rolls and rounds tracker
-    private int playerRolls = 0;
-    private int playedRounds = 0;
-    private int roundScore = 0;
-
     // Dice image index array, used to track selected dices
     private ArrayList<Integer> diceImageIndexArray = new ArrayList<>();;
 
     // Dice ImageView
     private ImageView[] diceViews = new ImageView[6];
     private int[] imageId = new int[6];
-
-    // Targeted sum of paired dices when grading != LOW
-    private int target = 0;
 
     // Drop down menu
     private Spinner spinner;
@@ -265,12 +257,12 @@ public class MainActivity extends AppCompatActivity {
 
     // Updates targeted score, gets unused gradings from array in the Score object contained in GameLogic
     private void updateTarget(int position) { // position = object in menu clicked
-        if(playedRounds == 9)
+        if(gameLogic.getPlayedRounds() == 9)
             return;
         if (gameLogic.getUnusedGradings().get(position) == "LOW")
-            target = 3;
+            gameLogic.setTarget(3);
         else
-            target = Integer.parseInt(gameLogic.getUnusedGradings().get(position));
+            gameLogic.setTarget(Integer.parseInt(gameLogic.getUnusedGradings().get(position)));
     }
 
     // Setup function for view objects
@@ -306,8 +298,7 @@ public class MainActivity extends AppCompatActivity {
     // Function for resetting game state
     private void resetGameState() {
         gameLogic.resetDices();
-        playerRolls = 0;
-        roundScore = 0;
+        gameLogic.setPlayerRolls(0);
         diceImageIndexArray.clear();
         for(int i = 0; i < DICES_AMOUNT; i++)
             setDiceImage(ROLLED, i);
@@ -327,15 +318,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // Save states in case of insufficient resource termination
+    // Save states
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         Log.d("","Saving state");
-        outState.putInt("playerRolls", playerRolls);
-        outState.putInt("playedRounds", playedRounds);
-        outState.putInt("roundScore", roundScore);
-        outState.putInt("target", target);
         outState.putParcelable("gameLogic", gameLogic);
         outState.putIntegerArrayList("diceImageIndexArray", diceImageIndexArray);
         outState.putIntArray("imageId", imageId);
@@ -343,14 +330,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // Rebuild in case of insufficient resource termination
+    // Rebuild state
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d("","Loading state");
-        playerRolls = savedInstanceState.getInt("playerRolls");
-        playedRounds = savedInstanceState.getInt("playedRounds");
-        roundScore = savedInstanceState.getInt("roundScore");
-        target = savedInstanceState.getInt("target");
 
         gameLogic = savedInstanceState.getParcelable("gameLogic");
 
@@ -362,12 +345,29 @@ public class MainActivity extends AppCompatActivity {
         // Update grading spinner
         updateSpinner();
 
+        // Setup View objects texts
+        setupTexts();
+
         // Redraw Dice images
         for (int i = 0; i < imageId.length; i++) {
             diceViews[i].setImageDrawable(getResources().getDrawable(imageId[i]));
         }
 
 
+
+    }
+
+    // Setup texts after state recreation
+    private void setupTexts() {
+        // Button texts
+        if (gameLogic.getPlayerRolls() == 2) {
+            button.setText("Score");
+            if (gameLogic.getPlayedRounds() >= 9) // Change button text for ending the game
+                button.setText("End Game");
+        }
+
+        tv_roundsPlayed.setText("Rounds played: " + gameLogic.getPlayedRounds() + " / 10");
+        tv_rolls.setText("Rolls: " + gameLogic.getPlayerRolls() + " / 2");
 
     }
 
@@ -392,16 +392,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleDiceClicked(int index) {
-        if (playerRolls > 1) {
+        if (gameLogic.getPlayerRolls() > 1) {
             if (gameLogic.isDiceUsed(index)){
                 Log.d("", "USED");
                 return;
             }
             gameLogic.updateGroupedScore(index);
 
-            if(target == 3) { // Grading LOW selected
+            if(gameLogic.getTarget() == 3) { // Grading LOW selected
                 if (gameLogic.getGroupedScore() <= 3) { // Selected dice is 3 or less
-                    setDiceImage(SCORE, index); // Set appropriate image for each dice
+                    setDiceImage(SCORE, index); // Set appropriate image for each dice (action SCORE adds the dice value to a tracker used for scoring)
                     gameLogic.handleGradingLow(index);
                     setDiceImage(PAIRED, index); // Recolor as a dice used to gain score
                 }
@@ -413,8 +413,8 @@ public class MainActivity extends AppCompatActivity {
             else {
                 setDiceImage(SCORE, index); // Set appropriate image for each dice
 
-                if(gameLogic.getGroupedScore() == target) { // Paired dices matches target score for selected grading
-                    gameLogic.handleGradingElse(index, target, playedRounds);
+                if(gameLogic.getGroupedScore() == gameLogic.getTarget()) { // Paired dices matches target score for selected grading
+                    gameLogic.handleGradingElse(index);
                     for (int i = 0; i < diceImageIndexArray.size(); i++) {
                         gameLogic.setDiceUsed(diceImageIndexArray.get(i), true); // set each dice used to gain score to used, cannot be used to gain score again this round
                         setDiceImage(PAIRED, diceImageIndexArray.get(i));
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
 
                     diceImageIndexArray.clear();
                 }
-                else if (gameLogic.getGroupedScore() > target) { // Paired dices exceeds the target score for selected grading
+                else if (gameLogic.getGroupedScore() > gameLogic.getTarget()) { // Paired dices exceeds the target score for selected grading
                     for (int i = 0; i < diceImageIndexArray.size(); i++) {
                         setDiceImage(ROLLED, diceImageIndexArray.get(i)); // Set appropriate image for each dice
                         gameLogic.setDiceUsed(diceImageIndexArray.get(i), false); // Allow the dices to be selected again (to potentially pair with different dices)
@@ -440,19 +440,16 @@ public class MainActivity extends AppCompatActivity {
     // Handle button click. Handle scoring if rolls == 2, handles game end if all rounds played and handles rolling else
     private void handleButtonClicked(Intent intent) {
 
-        if (playerRolls == 2) {
+        if (gameLogic.getPlayerRolls() == 2) {
 
             // SCORE THIS ROUND
-            if (target == 3) // Grading LOW
-                gameLogic.calculateLowScore();
-            else // Grading else
-                gameLogic.calculateScore(target, playedRounds);
+            gameLogic.scoreRound();
 
             // Update gradings menu
             updateSpinner();
 
             // Ends the game if all rounds played and scored
-            if (playedRounds >= 9) {
+            if (gameLogic.getPlayedRounds() >= 9) {
                 // Game ended
                 // Extras used in next activity to display score
                 intent.putExtra("TotalScore", gameLogic.getTotalScore());
@@ -468,9 +465,9 @@ public class MainActivity extends AppCompatActivity {
             // Restore default button text
             button.setText(getResources().getString(R.string.button_name));
 
-            playedRounds ++;
+            gameLogic.increasePlayedRounds();
 
-            tv_roundsPlayed.setText("Rounds played: " + playedRounds + " / 10");
+            tv_roundsPlayed.setText("Rounds played: " + gameLogic.getPlayedRounds() + " / 10");
             tv_rolls.setText("Rolls: 0 / 2");
 
             // Reset the games state for next round
@@ -486,20 +483,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             gameLogic.setKeepDice(i, false);
+
             // Set appropriate image for each dice
             setDiceImage(ROLLED, i);
         }
 
-        if (playerRolls == 1) {
+        if (gameLogic.getPlayerRolls() == 1) {
             // Change button text for scoring
             button.setText("Score");
-            if (playedRounds >= 9) // Change button text for ending the game
+            if (gameLogic.getPlayedRounds() >= 9) // Change button text for ending the game
                 button.setText("End Game");
         }
 
-        playerRolls++;
+        gameLogic.increasePlayerRolls();
 
-        tv_rolls.setText("Rolls: " + playerRolls + " / 2");
+        tv_rolls.setText("Rolls: " + gameLogic.getPlayerRolls() + " / 2");
     }
 
     // Function for avoiding miss-clicking back button (asks for confirmation before terminating app)

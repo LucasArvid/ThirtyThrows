@@ -1,6 +1,7 @@
 package com.example.inlmningsuppgift1.Controllers;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -9,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.inlmningsuppgift1.R;
@@ -106,4 +108,6 @@ public class ResultActivity extends AppCompatActivity {
         }
 
     }
+
+
 }
