@@ -17,16 +17,20 @@ import java.util.ArrayList;
 
 public class ResultActivity extends AppCompatActivity {
 
+    // Variables to store extras from previous activity containing scores
     private int totalScore;
     private int[] roundScore;
     private ArrayList<Integer> roundGrading;
 
+    // Intent for unpacking extras
     private Intent intent;
 
+    // View objects
     private TextView resultsView;
     private ListView resultsListView;
     private Button replayButton;
 
+    // Used to confirm applciation termination
     long prevTime;
 
 
@@ -40,17 +44,20 @@ public class ResultActivity extends AppCompatActivity {
         setupViews();
     }
 
+    // Retrieve extras from previous activity
     private void getExtras() {
         totalScore = intent.getIntExtra("TotalScore",0);
         roundScore = intent.getIntArrayExtra("RoundScore");
         roundGrading = intent.getIntegerArrayListExtra("RoundGrading");
     }
 
+    // Setup views
     private void setupViews() {
         resultsView = findViewById(R.id.textView);
         resultsListView = findViewById(R.id.listView);
         replayButton = findViewById(R.id.replay_button);
 
+        // Populate the views
         populateViews();
 
         replayButton.setText("Replay");
@@ -64,13 +71,20 @@ public class ResultActivity extends AppCompatActivity {
         });
     }
 
+    // Populate the views, connected adapter to listview that is filled with score from previous activity
     private void populateViews() {
         resultsView.setText(getResources().getString(R.string.results) + " " + totalScore);
 
         ArrayList<String> stringArray = new ArrayList<>();
+
+        // Populate ListView with grading and corresponding score
         for (int i = 0; i < roundGrading.size(); i++) {
-            stringArray.add("Grading: " + Integer.toString(roundGrading.get(i)) + " Generated " + Integer.toString(roundScore[i]) + " Points");
+            if (roundGrading.get(i) == 3)
+                stringArray.add("Grading: LOW Generated " + Integer.toString(roundScore[i]) + " Points");
+            else
+                stringArray.add("Grading: " + Integer.toString(roundGrading.get(i)) + " Generated " + Integer.toString(roundScore[i]) + " Points");
         }
+
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -79,6 +93,7 @@ public class ResultActivity extends AppCompatActivity {
         resultsListView.setAdapter(arrayAdapter);
     }
 
+    // Application termination confirmation on back button
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();

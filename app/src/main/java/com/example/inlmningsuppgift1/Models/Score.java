@@ -5,17 +5,33 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
-
+/*
+Custom class containing attributes and functions for handling score related data,
+implements parcelable for saving state
+*/
 public class Score implements Parcelable {
 
-    private static int dicePairs;
-    private static int groupedScore;
-    private static int[] gradingLowScore;
-    private static ArrayList<Integer> scoreTracker;
-    private int[] roundScore;
-    private ArrayList<Integer> roundGrading;
-    private static int totalScore;
+    // Used to calculate the score when not using grading LOW
+    private int dicePairs;
 
+    // Track score gained when using grading LOW
+    private int groupedScore;
+
+    // List of dices used for grading LOW score
+    private int[] gradingLowScore;
+
+    // Tracks the selected dices value
+    private ArrayList<Integer> scoreTracker;
+
+    // List to track which score was gained which round
+    private int[] roundScore;
+    // List to track which grading was used which round
+    private ArrayList<Integer> roundGrading;
+
+    // Players total score
+    private int totalScore;
+
+    // List to track which gradings that have not been used to gain score
     private ArrayList<String> unUsedGradings;
 
 
@@ -28,9 +44,11 @@ public class Score implements Parcelable {
         roundScore = new int[10];
         roundGrading = new ArrayList<>();
 
+        // Setup gradings list
         setupUnusedGradings();
     }
 
+    // Parcelable constructor
     protected Score(Parcel in) {
         dicePairs = in.readInt();
         groupedScore = in.readInt();
@@ -52,72 +70,48 @@ public class Score implements Parcelable {
         }
     };
 
-    public int getDicePairs() {
-        return dicePairs;
-    }
-
-    public void setDicePairs(int dicePairs) {
-        Score.dicePairs = dicePairs;
-    }
 
     public int getGroupedScore() {
         return groupedScore;
     }
 
-    public void setGroupedScore(int groupedScore) {
-        Score.groupedScore = groupedScore;
+    public void setGroupedScore(int newScore) {
+        groupedScore = newScore;
     }
 
-    public void updateGroupedScore(int groupedScore) {
-        Score.groupedScore += groupedScore;
+    public void updateGroupedScore(int increaseScoreBy) {
+        groupedScore += increaseScoreBy;
     }
 
-    public int[] getGradingLowScore() {
-        return gradingLowScore;
-    }
-
-    public void setGradingLowScore(int[] gradingLowScore) {
-        Score.gradingLowScore = gradingLowScore;
-    }
-
-    public ArrayList<Integer> getScoreTracker() {
-        return scoreTracker;
-    }
-
-    public static void updateScoreTracker(int value) {
+    public void updateScoreTracker(int value) {
         scoreTracker.add(value);
-    }
-
-    public void setScoreTracker(ArrayList<Integer> scoreTracker) {
-        Score.scoreTracker = scoreTracker;
     }
 
     public int[] getRoundScore() {
         return roundScore;
     }
 
+    // Tracks the dice value of each used dice below the value 3 when using grading LOW.
+    // variables used to calculate score when finishing round.
     public void handleGradingLow(Dice dice){
-        Log.d("", "SET USED");
         dice.setDiceUsed(true);
-        for (int i = 0; i < scoreTracker.size(); i++) {
+        for (int i = 0; i < scoreTracker.size(); i++)
             gradingLowScore[i] = scoreTracker.get(i);
-            Log.d("Debug", "" + gradingLowScore[i]);
-        }
         groupedScore = 0;
     }
 
+    // Sets the dices paired to used, and increases the amount of pairs that will give the-
+    // user score when finishing the round when not using grading LOW
     public void handleGradingElse(Dice dice, int target, int round) {
-        Log.d("", "SET USED");
         dice.setDiceUsed(true);
-
         dicePairs ++;
-
         // Clear score tracker and score counter
         groupedScore = 0;
     }
 
+    // Calculate the total score when not using grading LOW
     public int calculateScore(int grading, int round) {
-        // Summan av alla för valet ingående tärningars värde ger poängen
+
         int score = 0;
         score = dicePairs * grading;
         Log.d("GameLogic", "GameLogic Else Score: " + score);
@@ -126,12 +120,14 @@ public class Score implements Parcelable {
         dicePairs = 0;
         totalScore += score;
 
+        // Remove the used grading from the list, also used by controller to update the spinner menu
         while(unUsedGradings.contains(Integer.toString(grading)))
             unUsedGradings.remove(Integer.toString(grading));
 
         return score;
     }
 
+    // Calculate the total score gained from grading LOW
     public int calculateLowScore() {
         int score = 0;
         for (int i = 0; i < gradingLowScore.length; i++) {
@@ -143,6 +139,7 @@ public class Score implements Parcelable {
         totalScore += score;
         Log.d("GameLogic", "GameLogic Low Score: " + score);
 
+        // Remove the grading LOW from the list, also used by controller to update the spinner menu
         while(unUsedGradings.contains("LOW"))
             unUsedGradings.remove("LOW");
 
@@ -162,6 +159,7 @@ public class Score implements Parcelable {
         return totalScore;
     }
 
+    // Setup list containing gradings used for scoring
     public void setupUnusedGradings() {
         unUsedGradings = new ArrayList<>();
         unUsedGradings.add("LOW");
@@ -172,11 +170,6 @@ public class Score implements Parcelable {
     public ArrayList<String> getUnUsedGradings() {
         return unUsedGradings;
     }
-
-    public void resetUnusedGradings() {
-        setupUnusedGradings();
-    }
-
 
     @Override
     public int describeContents() {

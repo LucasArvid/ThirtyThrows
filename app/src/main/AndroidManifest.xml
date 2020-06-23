@@ -10,7 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Controllers.MainActivity"
-                android:label="">
+                  android:label=""
+                  android:configChanges="keyboard|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

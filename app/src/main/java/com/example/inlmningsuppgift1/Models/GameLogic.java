@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.*;
 
 /*
-    Class for game logic utility functions such as calculating player score.
+    Wrapper class containing gamelogic utilization of the classes Dice and Score.
+    Used by controller to update gamestate depending on user action.
+    Implements parcelable for saving states
  */
-
-
 public class GameLogic implements Parcelable {
 
     // Array of dices
     private ArrayList<Dice> dice;
+
+    // Score class containing all data relevant to the games score
     private Score score;
 
     public GameLogic(int amountOfDices) {
@@ -25,6 +27,7 @@ public class GameLogic implements Parcelable {
 
     }
 
+    // Parcelable constructor
     protected GameLogic(Parcel in) {
         dice = in.createTypedArrayList(Dice.CREATOR);
         score = in.readParcelable(Score.class.getClassLoader());
@@ -42,11 +45,11 @@ public class GameLogic implements Parcelable {
         }
     };
 
+    // Setup for the array containing Dices
     private void fillDiceArray(int size) {
         for (int i = 0; i < size; i++)
             dice.add(new Dice());
     }
-
 
     public void updateGroupedScore(int index) {
         score.updateGroupedScore(dice.get(index).getDiceValue());
