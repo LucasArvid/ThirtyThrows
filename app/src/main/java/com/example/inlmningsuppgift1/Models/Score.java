@@ -2,7 +2,6 @@ package com.example.inlmningsuppgift1.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.ArrayList;
 /*
@@ -114,7 +113,6 @@ public class Score implements Parcelable {
 
         int score = 0;
         score = dicePairs * grading;
-        Log.d("GameLogic", "GameLogic Else Score: " + score);
         roundScore[round] = score;
         roundGrading.add(grading);
         dicePairs = 0;
@@ -137,7 +135,6 @@ public class Score implements Parcelable {
         roundScore[roundGrading.size()] = score;
         roundGrading.add(3);
         totalScore += score;
-        Log.d("GameLogic", "GameLogic Low Score: " + score);
 
         // Remove the grading LOW from the list, also used by controller to update the spinner menu
         while(unUsedGradings.contains("LOW"))

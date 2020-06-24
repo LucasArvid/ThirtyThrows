@@ -2,10 +2,8 @@ package com.example.inlmningsuppgift1.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.*;
 
 /*
     Wrapper class containing gamelogic utilization of the classes Dice and Score.

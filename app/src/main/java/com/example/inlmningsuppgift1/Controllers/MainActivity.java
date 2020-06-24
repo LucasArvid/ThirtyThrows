@@ -322,7 +322,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Log.d("","Saving state");
         outState.putParcelable("gameLogic", gameLogic);
         outState.putIntegerArrayList("diceImageIndexArray", diceImageIndexArray);
         outState.putIntArray("imageId", imageId);
@@ -333,7 +332,6 @@ public class MainActivity extends AppCompatActivity {
     // Rebuild state
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("","Loading state");
 
         gameLogic = savedInstanceState.getParcelable("gameLogic");
 
