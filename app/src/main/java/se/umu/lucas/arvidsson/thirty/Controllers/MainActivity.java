@@ -24,6 +24,10 @@ import java.util.ArrayList;
 
 import se.umu.lucas.arvidsson.thirty.Models.GameLogic;
 
+/**
+ * Initial activity graphically displaying the game state to the player.
+ * Controller for the model and view.
+ */
 public class MainActivity extends AppCompatActivity {
 
     // - Defines - (Constants) //
@@ -34,7 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private final static int DICES_AMOUNT = 6;
 
     // Roll button, used to re-roll or score dices
-    private Button button;
+    private Button rollButton;
+    // Reset button, used to reset the pariing of dices.
+    private Button resetButton;
 
     // Used to track time between back button clicks, used to confirm intended action
     long prevTime;
@@ -62,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
 
 
+    /***
+     * Initial create function for the activity
+     * @param savedInstanceState Reference to Bundle object, null if first time activity is started.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,9 +87,15 @@ public class MainActivity extends AppCompatActivity {
         setupView();
 
         // Button click listener, used for rolling dices, scoring and ending the game
-        button.setOnClickListener(new View.OnClickListener() {
+        rollButton.setOnClickListener(new View.OnClickListener() {
             public void onClick (View v) {
                 handleButtonClicked(intent);
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick (View v) {
+                resetDicePairing();
             }
         });
 
@@ -94,15 +110,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Set correct image depending on user action for each dice ImageView
+    /***
+     * Set correct drawable depending on user action for each dice ImageView
+     * @param action Int describing action such as rolled, clicked etc.
+     * @param dice Int describing which dice was clicked.
+     */
     private void setDiceImage(int action, int dice) {
-        Drawable drawable;
         int diceValue = gameLogic.getDice(dice).getDiceValue();
+
         // Set the correct image for the dice
         diceViews[dice].setImageDrawable(getDrawable(action, dice, diceValue));
     }
 
-    // Gets the correct drawable for each action and dice value
+    /***
+     * Gets the correct drawable for each action and dice value
+     * @param action Int describing action such as rolled, clicked etc.
+     * @param dice Int describing which dice was clicked.
+     * @param diceValue The value of the selected dice.
+     * @return Returns a drawable of the correct dice.
+     */
     private Drawable getDrawable(int action, int dice, int diceValue) {
         Drawable drawable;
         if (action == CLICKED) {
@@ -133,7 +159,9 @@ public class MainActivity extends AppCompatActivity {
         return drawable;
     }
 
-    // Initial setup function for menu containing gradings
+    /***
+     *  Initial setup for the drop down menu containing gradings
+     */
     private void fillSpinner() {
         ArrayList<String> items = new ArrayList<>();
         items.add("LOW");
@@ -154,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (gameLogic.isGradingLocked()) {
+                    if(position == prevPosition)
+                        return;
                     spinner.setSelection(prevPosition);
                     Toast.makeText(getApplicationContext(), "Cannot change grading with dices paired", Toast.LENGTH_SHORT).show();
                     return;
@@ -168,8 +198,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Updates the target score for the grading and redraws the spinner without the used grading,
-    // gets list of unused gradings from Score object contained in GameLogic
+    /***
+     * Updates the target score for the grading and redraws the spinner without the used grading,
+     * gets list of unused gradings from Score object contained in GameLogic
+     */
     private void updateSpinner() {
 
         adapter.clear();
@@ -177,7 +209,10 @@ public class MainActivity extends AppCompatActivity {
         updateTarget(0);
     }
 
-    // Updates targeted score, gets unused gradings from array in the Score object contained in GameLogic
+    /***
+     * Updates targeted score, gets unused gradings from array in the Score object contained in GameLogic
+     * @param position the selected item in the spinner
+     */
     private void updateTarget(int position) { // position = object in menu clicked
         if(gameLogic.getPlayedRounds() == 9)
             return;
@@ -187,7 +222,9 @@ public class MainActivity extends AppCompatActivity {
             gameLogic.setTarget(Integer.parseInt(gameLogic.getUnusedGradings().get(position)));
     }
 
-    // Setup function for view objects
+    /***
+     * Setup function for view objects
+     */
     private void setupView() {
         // Initiate Spinner and Adapter
         spinner = findViewById(R.id.spinner);
@@ -198,11 +235,14 @@ public class MainActivity extends AppCompatActivity {
         // Connect to the dices ImageViews
         setupDices();
 
-        // Connect to the button
-        button = findViewById(R.id.button);
+        // Connect to the buttons
+        rollButton = findViewById(R.id.button);
+        resetButton = findViewById(R.id.resetButton);
     }
 
-    // Function for connecting to view objects and setting initial dice images
+    /***
+     * Function for connecting to view objects and setting initial dice images
+     */
     private void setupDices() {
         diceViews[0] = findViewById(R.id.imageView);
         diceViews[1] = findViewById(R.id.imageView2);
@@ -217,7 +257,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Function for resetting game state
+    /***
+     * Function for resetting game state and dices
+     */
     private void resetGameState() {
         gameLogic.resetDices();
         gameLogic.setPlayerRolls(0);
@@ -226,7 +268,10 @@ public class MainActivity extends AppCompatActivity {
             setDiceImage(ROLLED, i);
     }
 
-    // Function for handling rotation
+    /***
+     *  Function for handling screen rotation
+     * @param newConfig new configuration object
+     */
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -237,21 +282,24 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setMargins(55);
         }
-
     }
 
-    // Save states
+    /***
+     * Function called on saving of states
+     * @param outState Bundle for saving state
+     */
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("gameLogic", gameLogic);
         outState.putIntegerArrayList("diceImageIndexArray", diceImageIndexArray);
         outState.putIntArray("imageId", imageId);
-
-
     }
 
-    // Rebuild state
+    /***
+     * Function for rebuild state
+     * @param savedInstanceState Bundle containing saved states
+     */
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
@@ -272,18 +320,17 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < imageId.length; i++) {
             diceViews[i].setImageDrawable(getResources().getDrawable(imageId[i]));
         }
-
-
-
     }
 
-    // Setup texts after state recreation
+    /***
+     * Setup texts after state recreation
+     */
     private void setupTexts() {
         // Button texts
         if (gameLogic.getPlayerRolls() == 2) {
-            button.setText("Score");
+            rollButton.setText("Score");
             if (gameLogic.getPlayedRounds() >= 9) // Change button text for ending the game
-                button.setText("End Game");
+                rollButton.setText("End Game");
         }
 
         tv_roundsPlayed.setText("Rounds played: " + gameLogic.getPlayedRounds() + " / 10");
@@ -291,7 +338,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // Function for adjusting margins
+    /***
+     * Function for adjusting View objects margins
+     * @param margin
+     */
     private void setMargins(int margin) {
 
         // Most left views
@@ -311,6 +361,32 @@ public class MainActivity extends AppCompatActivity {
         diceViews[5].setLayoutParams(params);
     }
 
+    /***
+     * Function for resetting the dices used for scoring.
+     * Can be used if the players wants to change grading after already pairing dices.
+     */
+    private void resetDicePairing() {
+        gameLogic.setGradingLocked(false);
+        // reset color and used tracker on all dices.
+        for (int i = 0; i < DICES_AMOUNT; i++) {
+            setDiceImage(ROLLED, i);
+            gameLogic.setDiceUsed(i, false);
+        }
+        // Reset the amount of dices successfully paired.
+        gameLogic.setDicePairs(0);
+        // Reset the amount of dices used for scoring with grading LOW.
+        gameLogic.resetGradingLowScore();
+        // Reset the round score tracker.
+        gameLogic.resetRoundScoreTracker();
+        // Reset the tracker for which dice is in processes of being paired.
+        diceImageIndexArray.clear();
+    }
+
+    /***
+     * Function for handling dice images being clicked.
+     * Functionality dependent on selected grading (target).
+     * @param index Dice image that was clicked
+     */
     private void handleDiceClicked(int index) {
         if (gameLogic.getPlayerRolls() > 1) {
             if (gameLogic.isDiceUsed(index)){
@@ -359,11 +435,13 @@ public class MainActivity extends AppCompatActivity {
             setDiceImage(CLICKED, index); // Set appropriate image for each dice
     }
 
-    // Handle button click. Handle scoring if rolls == 2, handles game end if all rounds played and handles rolling else
+    /***
+     * Handle button click. Handle scoring if rolls == 2, handles game end if all rounds played and handles rolling else
+     * @param intent Intent for starting new activity
+     */
     private void handleButtonClicked(Intent intent) {
 
         if (gameLogic.getPlayerRolls() == 2) {
-
             // SCORE THIS ROUND
             gameLogic.scoreRound();
             gameLogic.setGradingLocked(false);
@@ -377,18 +455,13 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("TotalScore", gameLogic.getTotalScore());
                 intent.putExtra("RoundScore", gameLogic.getRoundScore());
                 intent.putIntegerArrayListExtra("RoundGrading", gameLogic.getRoundGrading());
-
                 startActivity(intent); // Start next activity
-
                 finish(); // terminate activity
-
             }
-
             // Restore default button text
-            button.setText(getResources().getString(R.string.button_name));
-
+            rollButton.setText(getResources().getString(R.string.button_name));
             gameLogic.increasePlayedRounds();
-
+            // Set appropriate text.
             tv_roundsPlayed.setText("Rounds played: " + gameLogic.getPlayedRounds() + " / 10");
             tv_rolls.setText("Rolls: 0 / 2");
 
@@ -397,32 +470,29 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Rerolls the dices that the user does not want to keep
+        // Re-rolls the dices that the user does not want to keep
         for (int i = 0; i < DICES_AMOUNT; i++) {
             if (!gameLogic.getKeepDice(i)) {
                 // Randomize dice value
                 gameLogic.randomizeDice(i);
             }
-
             gameLogic.setKeepDice(i, false);
-
             // Set appropriate image for each dice
             setDiceImage(ROLLED, i);
         }
-
         if (gameLogic.getPlayerRolls() == 1) {
             // Change button text for scoring
-            button.setText("Score");
+            rollButton.setText("Score");
             if (gameLogic.getPlayedRounds() >= 9) // Change button text for ending the game
-                button.setText("End Game");
+                rollButton.setText("End Game");
         }
-
         gameLogic.increasePlayerRolls();
-
         tv_rolls.setText("Rolls: " + gameLogic.getPlayerRolls() + " / 2");
     }
 
-    // Function for avoiding miss-clicking back button (asks for confirmation before terminating app)
+    /***
+     * Function for avoiding miss-clicking back button (asks for confirmation before terminating app)
+     */
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();

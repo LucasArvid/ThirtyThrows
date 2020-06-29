@@ -15,6 +15,10 @@ import se.umu.lucas.arvidsson.thirty.R;
 
 import java.util.ArrayList;
 
+/***
+ * Result activity graphically displaying the game results to the player.
+ * Takes intent extras from previous activity (MainActivity).
+ */
 public class ResultActivity extends AppCompatActivity {
 
     // Variables to store extras from previous activity containing scores
@@ -33,7 +37,10 @@ public class ResultActivity extends AppCompatActivity {
     // Used to confirm applciation termination
     long prevTime;
 
-
+    /***
+     * Initial create function for the activity
+     * @param savedInstanceState Reference to Bundle object, null if first time activity is started.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,14 +51,18 @@ public class ResultActivity extends AppCompatActivity {
         setupViews();
     }
 
-    // Retrieve extras from previous activity
+    /***
+     * Collect extras from the previous activity
+     */
     private void getExtras() {
         totalScore = intent.getIntExtra("TotalScore",0);
         roundScore = intent.getIntArrayExtra("RoundScore");
         roundGrading = intent.getIntegerArrayListExtra("RoundGrading");
     }
 
-    // Setup views
+    /***
+     *  Initial setup of the views.
+     */
     private void setupViews() {
         resultsView = findViewById(R.id.textView);
         resultsListView = findViewById(R.id.listView);
@@ -71,7 +82,9 @@ public class ResultActivity extends AppCompatActivity {
         });
     }
 
-    // Populate the views, connected adapter to listview that is filled with score from previous activity
+    /***
+     * Populate the views, connected adapter to listview that is filled with score from previous activity
+     */
     private void populateViews() {
         resultsView.setText(getResources().getString(R.string.results) + " " + totalScore);
 
@@ -93,7 +106,9 @@ public class ResultActivity extends AppCompatActivity {
         resultsListView.setAdapter(arrayAdapter);
     }
 
-    // Application termination confirmation on back button
+    /***
+     * Function for avoiding miss-clicking back button (asks for confirmation before terminating app)
+     */
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();

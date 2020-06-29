@@ -5,10 +5,10 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-/*
-Custom class containing attributes and functions for handling score related data,
-implements parcelable for saving state
-*/
+/***
+ * Class containing the attributes and functions for handling the game score related data.
+ * Implements parcelable for saving the state.
+ */
 public class Score implements Parcelable {
 
     // Used to calculate the score when not using grading LOW
@@ -34,8 +34,9 @@ public class Score implements Parcelable {
     // List to track which gradings that have not been used to gain score
     private ArrayList<String> unUsedGradings;
 
-
-
+    /***
+     * Default constructor
+     */
     public Score() {
         dicePairs = 0;
         groupedScore = 0;
@@ -48,7 +49,10 @@ public class Score implements Parcelable {
         setupUnusedGradings();
     }
 
-    // Parcelable constructor
+    /***
+     * Parcelable constructor
+     * @param in Parcel in, for reconstructing state
+     */
     protected Score(Parcel in) {
         dicePairs = in.readInt();
         groupedScore = in.readInt();
@@ -59,62 +63,113 @@ public class Score implements Parcelable {
         unUsedGradings = in.readArrayList(String.class.getClassLoader());
     }
 
+    /***
+     * Parcelable function that generates instances of the Parcelable class from a Parcel.
+     */
     public static final Creator<Score> CREATOR = new Creator<Score>() {
+        /***
+         * Constructing of single object
+         * @param in Parcel object
+         * @return Constructed class object
+         */
         @Override
         public Score createFromParcel(Parcel in) {
             return new Score(in);
         }
 
+        /***
+         * Constructing of array of object
+         * @param size Size of array
+         * @return Constructed array of class object
+         */
         @Override
         public Score[] newArray(int size) {
             return new Score[size];
         }
     };
 
-
+    /***
+     * Getter for the grouped score tracker which tracks the amount of score gained with grading LOW.
+     * @return The grouped score.
+     */
     public int getGroupedScore() {
         return groupedScore;
     }
 
+    /***
+     * Setter for the grouped score tracker.
+     * @param newScore The new grouped score.
+     */
     public void setGroupedScore(int newScore) {
         groupedScore = newScore;
     }
 
+    /***
+     * Function for reseting the score tracker when using grading LOW.
+     */
+    public void resetGradingLowScore() {
+        gradingLowScore = null;
+        gradingLowScore = new int[6];
+    }
+
+    /***
+     * Function for updating the grouped score tracker.
+     * @param increaseScoreBy The amount to increase the grouped score tracker with.
+     */
     public void updateGroupedScore(int increaseScoreBy) {
         groupedScore += increaseScoreBy;
     }
 
-    public int getDicePairs() {
-        return dicePairs;
-    }
-
+    /***
+     * Function for updating the list containing the selected dices score value.
+     * @param value The new score to be added.
+     */
     public void updateScoreTracker(int value) {
         scoreTracker.add(value);
     }
 
+    /***
+     * Function for getting the array tracking which score was gained which round.
+     * @return Returns the entire array.
+     */
     public int[] getRoundScore() {
         return roundScore;
     }
 
-    // Tracks the dice value of each used dice below the value 3 when using grading LOW.
-    // variables used to calculate score when finishing round.
-    public void handleGradingLow(Dice dice){
-        dice.setDiceUsed(true);
+    /***
+     * Function for setting the amount of dice successfully paired. Also used to reset the tracker.
+     * @param pairs The amount of pairs.
+     */
+    public void setDicePairs(int pairs) {
+        dicePairs = pairs;
+    }
+
+    /***
+     * Tracks the dice value of each used dice below the value 3 when using grading LOW.
+     * Variables are used to calculate score when finishing round.
+     */
+    public void handleGradingLow(){
         for (int i = 0; i < scoreTracker.size(); i++)
             gradingLowScore[i] = scoreTracker.get(i);
         groupedScore = 0;
     }
 
-    // Sets the dices paired to used, and increases the amount of pairs that will give the-
-    // user score when finishing the round when not using grading LOW
-    public void handleGradingElse(Dice dice) {
-        dice.setDiceUsed(true);
+    /***
+     * Sets the dices paired to used, and increases the amount of pairs that will give the-
+     * user score when finishing the round when not using grading LOW
+     */
+    public void handleGradingElse() {
         dicePairs ++;
         // Clear score tracker and score counter
         groupedScore = 0;
     }
 
-    // Calculate the total score when not using grading LOW
+    /***
+     * Function for calculating the total round score when not using grading LOW.
+     * @param grading The selected grading.
+     * @param round The current round.
+     * @return The calculated score.
+     */
     public int calculateScore(int grading, int round) {
 
         int score = 0;
@@ -131,7 +186,10 @@ public class Score implements Parcelable {
         return score;
     }
 
-    // Calculate the total score gained from grading LOW
+    /***
+     * Function for calculating the total round score when using grading LOW.
+     * @return The calculated score.
+     */
     public int calculateLowScore() {
         int score = 0;
         for (int i = 0; i < gradingLowScore.length; i++) {
@@ -149,24 +207,33 @@ public class Score implements Parcelable {
         return score;
     }
 
+    /***
+     * Function for resetting the round score tracker. Also resets the tracker for the dice values used for grading LOW
+     */
     public void resetRoundScoreTracker() {
         scoreTracker.clear();
         groupedScore = 0;
     }
 
-    public int[] getGradingLowScore() {
-        return gradingLowScore;
-    }
-
+    /***
+     * Function for getting the list tracking which grading was used which round.
+     * @return The entire List.
+     */
     public ArrayList<Integer> getRoundGrading() {
         return roundGrading;
     }
 
+    /***
+     * Function for getting the total score.
+     * @return The total score.
+     */
     public int getTotalScore() {
         return totalScore;
     }
 
-    // Setup list containing gradings used for scoring
+    /***
+     * Function for setting up the list containing the unused gradings.
+     */
     public void setupUnusedGradings() {
         unUsedGradings = new ArrayList<>();
         unUsedGradings.add("LOW");
@@ -174,15 +241,28 @@ public class Score implements Parcelable {
             unUsedGradings.add(Integer.toString(i));
     }
 
+    /***
+     * Function for getting the list containing the currently unused gradings.
+     * @return
+     */
     public ArrayList<String> getUnUsedGradings() {
         return unUsedGradings;
     }
 
+    /***
+     * Parcelable function for creating bitmask. Returns 0 if there is no need for FileDescriptor, CONTENTS_FILE_DESCRIPTOR otherwise.
+     * @return Returns 0
+     */
     @Override
     public int describeContents() {
         return 0;
     }
 
+    /***
+     * Parcel function for saving the object state
+     * @param dest Parcel to be saved to.
+     * @param flags Flags describing how the object should be written.
+     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
