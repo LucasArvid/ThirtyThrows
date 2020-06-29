@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     // Used to track time between back button clicks, used to confirm intended action
     long prevTime;
 
+    private int prevPosition = 0;
+
     // Dice image index array, used to track selected dices
     private ArrayList<Integer> diceImageIndexArray = new ArrayList<>();;
 
@@ -151,6 +153,12 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (gameLogic.isGradingLocked()) {
+                    spinner.setSelection(prevPosition);
+                    Toast.makeText(getApplicationContext(), "Cannot change grading with dices paired", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                prevPosition = position;
                 updateTarget(position);
             }
 
@@ -313,6 +321,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(gameLogic.getTarget() == 3) { // Grading LOW selected
                 if (gameLogic.getGroupedScore() <= 3) { // Selected dice is 3 or less
+                    gameLogic.setGradingLocked(true);
                     setDiceImage(SCORE, index); // Set appropriate image for each dice (action SCORE adds the dice value to a tracker used for scoring)
                     gameLogic.handleGradingLow(index);
                     setDiceImage(PAIRED, index); // Recolor as a dice used to gain score
@@ -326,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
                 setDiceImage(SCORE, index); // Set appropriate image for each dice
 
                 if(gameLogic.getGroupedScore() == gameLogic.getTarget()) { // Paired dices matches target score for selected grading
+                    gameLogic.setGradingLocked(true);
                     gameLogic.handleGradingElse(index);
                     for (int i = 0; i < diceImageIndexArray.size(); i++) {
                         gameLogic.setDiceUsed(diceImageIndexArray.get(i), true); // set each dice used to gain score to used, cannot be used to gain score again this round
@@ -356,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
 
             // SCORE THIS ROUND
             gameLogic.scoreRound();
-
+            gameLogic.setGradingLocked(false);
             // Update gradings menu
             updateSpinner();
 

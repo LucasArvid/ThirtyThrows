@@ -19,6 +19,8 @@ public class GameLogic implements Parcelable {
     private int playerRolls;
     private int playedRounds;
 
+    private boolean gradingLocked = false;
+
     // target for sum of dices when grading
     private int target;
 
@@ -84,9 +86,17 @@ public class GameLogic implements Parcelable {
         score.handleGradingLow(dice.get(index));
     }
 
+    public int getDicePairs() {
+        return score.getDicePairs();
+    }
+
     public void randomizeDice(int index) {
         dice.get(index).randomizeDice();
 
+    }
+
+    public int[] getGradingLowScore() {
+        return score.getGradingLowScore();
     }
 
     public void handleGradingElse(int index) {
@@ -120,6 +130,14 @@ public class GameLogic implements Parcelable {
         for (Dice d : dice) {
             d.resetDice();
         }
+    }
+
+    public boolean isGradingLocked() {
+        return gradingLocked;
+    }
+
+    public void setGradingLocked(boolean gradingLocked) {
+        this.gradingLocked = gradingLocked;
     }
 
     public boolean isDiceUsed(int index) {

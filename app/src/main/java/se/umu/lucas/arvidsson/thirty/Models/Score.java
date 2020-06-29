@@ -84,6 +84,10 @@ public class Score implements Parcelable {
         groupedScore += increaseScoreBy;
     }
 
+    public int getDicePairs() {
+        return dicePairs;
+    }
+
     public void updateScoreTracker(int value) {
         scoreTracker.add(value);
     }
@@ -148,6 +152,10 @@ public class Score implements Parcelable {
     public void resetRoundScoreTracker() {
         scoreTracker.clear();
         groupedScore = 0;
+    }
+
+    public int[] getGradingLowScore() {
+        return gradingLowScore;
     }
 
     public ArrayList<Integer> getRoundGrading() {
