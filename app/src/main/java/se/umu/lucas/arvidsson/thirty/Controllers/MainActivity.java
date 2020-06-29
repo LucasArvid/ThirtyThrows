@@ -202,11 +202,15 @@ public class MainActivity extends AppCompatActivity {
      * Updates the target score for the grading and redraws the spinner without the used grading,
      * gets list of unused gradings from Score object contained in GameLogic
      */
-    private void updateSpinner() {
+    private void updateSpinner(boolean rebuild) {
 
         adapter.clear();
         adapter.addAll(gameLogic.getUnusedGradings());
-        updateTarget(0);
+        if (!rebuild) {
+            updateTarget(0);
+            spinner.setSelection(0);
+        }
+
     }
 
     /***
@@ -218,8 +222,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         if (gameLogic.getUnusedGradings().get(position).equals("LOW"))
             gameLogic.setTarget(3);
-        else
+        else {
             gameLogic.setTarget(Integer.parseInt(gameLogic.getUnusedGradings().get(position)));
+        }
     }
 
     /***
@@ -294,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putParcelable("gameLogic", gameLogic);
         outState.putIntegerArrayList("diceImageIndexArray", diceImageIndexArray);
         outState.putIntArray("imageId", imageId);
+        outState.putInt("prevPosition", prevPosition);
     }
 
     /***
@@ -309,9 +315,11 @@ public class MainActivity extends AppCompatActivity {
 
         imageId = savedInstanceState.getIntArray("imageId");
 
+        prevPosition = savedInstanceState.getInt("prevPosition");
+
 
         // Update grading spinner
-        updateSpinner();
+        updateSpinner(true);
 
         // Setup View objects texts
         setupTexts();
@@ -409,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
 
             else {
                 setDiceImage(SCORE, index); // Set appropriate image for each dice
-
+                gameLogic.setDiceUsed(index, true);
                 if(gameLogic.getGroupedScore() == gameLogic.getTarget()) { // Paired dices matches target score for selected grading
                     gameLogic.setGradingLocked(true);
                     gameLogic.handleGradingElse(index);
@@ -446,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
             gameLogic.scoreRound();
             gameLogic.setGradingLocked(false);
             // Update gradings menu
-            updateSpinner();
+            updateSpinner(false);
 
             // Ends the game if all rounds played and scored
             if (gameLogic.getPlayedRounds() >= 9) {

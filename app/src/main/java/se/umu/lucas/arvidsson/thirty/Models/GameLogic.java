@@ -52,6 +52,7 @@ public class GameLogic implements Parcelable {
         playerRolls = in.readInt();
         playedRounds = in.readInt();
         target = in.readInt();
+        gradingLocked = in.readByte() != 0;
     }
 
     /***
@@ -374,5 +375,6 @@ public class GameLogic implements Parcelable {
         dest.writeInt(playerRolls);
         dest.writeInt(playedRounds);
         dest.writeInt(target);
+        dest.writeByte((byte) (gradingLocked ? 1 : 0));
     }
 }
