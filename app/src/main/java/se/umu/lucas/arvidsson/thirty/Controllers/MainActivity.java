@@ -95,127 +95,40 @@ public class MainActivity extends AppCompatActivity {
     // Set correct image depending on user action for each dice ImageView
     private void setDiceImage(int action, int dice) {
         Drawable drawable;
-
-        switch (gameLogic.getDice(dice).getDiceValue()) {
-            case 1:
-                if (action == CLICKED) { // User wants to keep dice
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey1; // Used to redraw the correct image when recreating activity
-                    drawable = getResources().getDrawable(R.drawable.grey1);
-                } else if (action == SCORE) { // User wants to score with dice
-                    imageId[dice] = R.drawable.red1;
-                    drawable = getResources().getDrawable(R.drawable.red1);
-                    diceImageIndexArray.add(dice); // Used to track which dices have been paired for scoring
-                    gameLogic.updateScoreTracker(1);
-                } else if (action == PAIRED) { // Used to color code which dices have been used as a pair to get score
-                    imageId[dice] = R.drawable.green1;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else { // User rolled dice
-                    imageId[dice] = R.drawable.white1;
-                    drawable = getResources().getDrawable(R.drawable.white1);
-                }
-                break;
-            case 2:
-                if (action == CLICKED) {
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey2;
-                    drawable = getResources().getDrawable(R.drawable.grey2);
-                } else if (action == SCORE) {
-                    imageId[dice] = R.drawable.red2;
-                    drawable = getResources().getDrawable(R.drawable.red2);
-                    diceImageIndexArray.add(dice);
-                    gameLogic.updateScoreTracker(2);
-                } else if (action == PAIRED) {
-                    imageId[dice] = R.drawable.green2;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else {
-                    imageId[dice] = R.drawable.white2;
-                    drawable = getResources().getDrawable(R.drawable.white2);;
-                }
-                break;
-            case 3:
-                if (action == CLICKED) {
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey3;
-                    drawable = getResources().getDrawable(R.drawable.grey3);
-                } else if (action == SCORE) {
-                    imageId[dice] = R.drawable.red3;
-                    drawable = getResources().getDrawable(R.drawable.red3);
-                    diceImageIndexArray.add(dice);
-                    gameLogic.updateScoreTracker(3);
-
-                } else if (action == PAIRED) {
-                    imageId[dice] = R.drawable.green3;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else {
-                    imageId[dice] = R.drawable.white3;
-                    drawable = getResources().getDrawable(R.drawable.white3);
-                }
-                break;
-            case 4:
-                if (action == CLICKED) {
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey4;
-                    drawable = getResources().getDrawable(R.drawable.grey4);
-                } else if (action == SCORE) {
-                    imageId[dice] = R.drawable.red4;
-                    drawable = getResources().getDrawable(R.drawable.red4);
-                    diceImageIndexArray.add(dice);
-                    gameLogic.updateScoreTracker(4);
-
-                } else if (action == PAIRED) {
-                    imageId[dice] = R.drawable.green4;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else {
-                    imageId[dice] = R.drawable.white4;
-                    drawable = getResources().getDrawable(R.drawable.white4);
-                }
-                break;
-            case 5:
-                if (action == CLICKED) {
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey5;
-                    drawable = getResources().getDrawable(R.drawable.grey5);
-                } else if (action == SCORE) {
-                    imageId[dice] = R.drawable.red5;
-                    drawable = getResources().getDrawable(R.drawable.red5);
-                    diceImageIndexArray.add(dice);
-                    gameLogic.updateScoreTracker(5);
-
-                } else if (action == PAIRED) {
-                    imageId[dice] = R.drawable.green5;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else {
-                    imageId[dice] = R.drawable.white5;
-                    drawable = getResources().getDrawable(R.drawable.white5);
-                }
-                break;
-            case 6:
-                if (action == CLICKED) {
-                    gameLogic.setKeepDice(dice, true);
-                    imageId[dice] = R.drawable.grey6;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else if (action == SCORE) {
-                    imageId[dice] = R.drawable.red6;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                    diceImageIndexArray.add(dice);
-                    gameLogic.updateScoreTracker(6);
-
-                } else if (action == PAIRED) {
-                    imageId[dice] = R.drawable.green6;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                } else {
-                    imageId[dice] = R.drawable.white6;
-                    drawable = getResources().getDrawable(imageId[dice]);
-                }
-                break;
-            default:
-                imageId[dice] = R.drawable.red1;
-                drawable = getResources().getDrawable(imageId[dice]);
-                break;
-        }
+        int diceValue = gameLogic.getDice(dice).getDiceValue();
         // Set the correct image for the dice
-        diceViews[dice].setImageDrawable(drawable);
+        diceViews[dice].setImageDrawable(getDrawable(action, dice, diceValue));
+    }
+
+    // Gets the correct drawable for each action and dice value
+    private Drawable getDrawable(int action, int dice, int diceValue) {
+        Drawable drawable;
+        if (action == CLICKED) {
+            String uri = "drawable/grey" + diceValue;
+            int imageResource = getResources().getIdentifier(uri, "drawable", getPackageName());
+            gameLogic.setKeepDice(dice, true);
+            imageId[dice] = imageResource;
+            drawable = getResources().getDrawable(imageResource);
+        } else if (action == SCORE) {
+            String uri = "drawable/red" + diceValue;
+            int imageResource = getResources().getIdentifier(uri, "drawable", getPackageName());
+            imageId[dice] = imageResource;
+            drawable = getResources().getDrawable(imageResource);
+            diceImageIndexArray.add(dice);
+            gameLogic.updateScoreTracker(diceValue);
+
+        } else if (action == PAIRED) {
+            String uri = "drawable/green" + diceValue;
+            int imageResource = getResources().getIdentifier(uri, "drawable", getPackageName());
+            imageId[dice] = imageResource;
+            drawable = getResources().getDrawable(imageResource);
+        } else {
+            String uri = "drawable/white" + diceValue;
+            int imageResource = getResources().getIdentifier(uri, "drawable", getPackageName());
+            imageId[dice] = imageResource;
+            drawable = getResources().getDrawable(imageResource);
+        }
+        return drawable;
     }
 
     // Initial setup function for menu containing gradings
@@ -260,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateTarget(int position) { // position = object in menu clicked
         if(gameLogic.getPlayedRounds() == 9)
             return;
-        if (gameLogic.getUnusedGradings().get(position) == "LOW")
+        if (gameLogic.getUnusedGradings().get(position).equals("LOW"))
             gameLogic.setTarget(3);
         else
             gameLogic.setTarget(Integer.parseInt(gameLogic.getUnusedGradings().get(position)));

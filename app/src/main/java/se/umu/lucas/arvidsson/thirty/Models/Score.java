@@ -56,6 +56,7 @@ public class Score implements Parcelable {
         scoreTracker = in.readArrayList(String.class.getClassLoader());
         roundScore = in.createIntArray();
         roundGrading = in.readArrayList(String.class.getClassLoader());
+        unUsedGradings = in.readArrayList(String.class.getClassLoader());
     }
 
     public static final Creator<Score> CREATOR = new Creator<Score>() {
@@ -102,7 +103,7 @@ public class Score implements Parcelable {
 
     // Sets the dices paired to used, and increases the amount of pairs that will give the-
     // user score when finishing the round when not using grading LOW
-    public void handleGradingElse(Dice dice, int target, int round) {
+    public void handleGradingElse(Dice dice) {
         dice.setDiceUsed(true);
         dicePairs ++;
         // Clear score tracker and score counter
@@ -183,6 +184,7 @@ public class Score implements Parcelable {
         dest.writeList(scoreTracker);
         dest.writeIntArray(roundScore);
         dest.writeList(roundGrading);
+        dest.writeList(unUsedGradings);
 
     }
 }

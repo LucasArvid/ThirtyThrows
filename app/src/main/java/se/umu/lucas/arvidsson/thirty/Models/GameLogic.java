@@ -90,7 +90,7 @@ public class GameLogic implements Parcelable {
     }
 
     public void handleGradingElse(int index) {
-        score.handleGradingElse(dice.get(index), target, playedRounds);
+        score.handleGradingElse(dice.get(index));
     }
 
     public void setKeepDice(int index, boolean KEEP) {
