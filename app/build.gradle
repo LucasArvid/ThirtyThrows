@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.example.inlmningsuppgift1"
+        applicationId "se.umu.lucas.arvidsson.thirty"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1

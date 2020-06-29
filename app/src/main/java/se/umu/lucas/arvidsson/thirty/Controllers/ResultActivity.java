@@ -1,4 +1,4 @@
-package com.example.inlmningsuppgift1.Controllers;
+package se.umu.lucas.arvidsson.thirty.Controllers;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,10 +9,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.inlmningsuppgift1.R;
+import se.umu.lucas.arvidsson.thirty.R;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,4 @@
-package com.example.inlmningsuppgift1.Controllers;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+package se.umu.lucas.arvidsson.thirty.Controllers;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -18,10 +14,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.inlmningsuppgift1.Models.GameLogic;
-import com.example.inlmningsuppgift1.R;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import se.umu.lucas.arvidsson.thirty.R;
 
 import java.util.ArrayList;
+
+import se.umu.lucas.arvidsson.thirty.Models.GameLogic;
 
 public class MainActivity extends AppCompatActivity {
 

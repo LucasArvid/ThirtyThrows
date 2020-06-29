@@ -1,9 +1,10 @@
-package com.example.inlmningsuppgift1.Models;
+package se.umu.lucas.arvidsson.thirty.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+
 /*
 Custom class containing attributes and functions for handling score related data,
 implements parcelable for saving state

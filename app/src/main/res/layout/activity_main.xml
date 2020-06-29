@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Controllers.MainActivity">
+    tools:context="se.umu.lucas.Controllers.MainActivity">
 
     <ImageView
         android:id="@+id/imageView5"

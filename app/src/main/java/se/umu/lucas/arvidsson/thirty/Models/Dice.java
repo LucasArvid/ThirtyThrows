@@ -1,4 +1,4 @@
-package com.example.inlmningsuppgift1.Models;
+package se.umu.lucas.arvidsson.thirty.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,7 +34,7 @@ public class Dice implements Parcelable{
         dice = in.readInt();
     }
 
-    public static final Parcelable.Creator<Dice> CREATOR = new Parcelable.Creator<Dice>() {
+    public static final Creator<Dice> CREATOR = new Creator<Dice>() {
         @Override
         public Dice createFromParcel(Parcel in) {
             return new Dice(in);

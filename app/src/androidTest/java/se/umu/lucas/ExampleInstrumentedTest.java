@@ -1,4 +1,4 @@
-package com.example.inlmningsuppgift1;
+package se.umu.lucas;
 
 import android.content.Context;
 

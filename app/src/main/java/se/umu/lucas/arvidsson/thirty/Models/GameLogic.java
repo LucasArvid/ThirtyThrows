@@ -1,4 +1,4 @@
-package com.example.inlmningsuppgift1.Models;
+package se.umu.lucas.arvidsson.thirty.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
